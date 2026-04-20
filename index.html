@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CPHAVEN</title>
+    <title>corn.lol</title>
     <style>
         body {
-            font-family: 'Segoe UI', sans-serif;
-            background-color: #0b0b0b;
-            color: #eee;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: #080808;
+            color: #ffffff;
             margin: 0;
             display: flex;
             flex-direction: column;
@@ -19,7 +19,7 @@
         #main-content {
             display: none;
             width: 90%;
-            max-width: 1100px;
+            max-width: 1200px;
             padding: 40px 20px;
             text-align: center;
         }
@@ -27,69 +27,115 @@
         h1 {
             color: #00ffcc;
             text-transform: uppercase;
-            margin-bottom: 10px;
+            letter-spacing: 5px;
+            margin-bottom: 40px;
+            font-size: 2.5rem;
         }
 
-        .tabs {
-            margin-bottom: 30px;
+        /* Category Selection Screen */
+        .category-selector {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            flex-wrap: wrap;
+            margin-top: 50px;
         }
 
-        .tab-btn {
-            background: #222;
-            color: #fff;
-            border: 1px solid #444;
-            padding: 10px 25px;
+        .cat-card {
+            width: 300px;
+            height: 400px;
+            position: relative;
+            border-radius: 15px;
+            overflow: hidden;
             cursor: pointer;
-            font-size: 16px;
-            margin: 5px;
-            border-radius: 4px;
-            transition: 0.3s;
+            border: 2px solid #222;
+            transition: transform 0.3s ease, border-color 0.3s ease;
         }
 
-        .tab-btn.active {
-            background: #00ffcc;
-            color: #000;
+        .cat-card:hover {
+            transform: scale(1.05);
             border-color: #00ffcc;
+        }
+
+        .cat-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: brightness(0.5);
+            transition: filter 0.3s ease;
+        }
+
+        .cat-card:hover img {
+            filter: brightness(0.8);
+        }
+
+        .cat-card span {
+            position: absolute;
+            bottom: 20px;
+            left: 0;
+            right: 0;
+            font-size: 24px;
+            font-weight: bold;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        /* Gallery Grid */
+        .gallery-view {
+            display: none;
+        }
+
+        .back-btn {
+            background: #222;
+            color: #00ffcc;
+            border: 1px solid #00ffcc;
+            padding: 10px 20px;
+            cursor: pointer;
+            margin-bottom: 30px;
+            border-radius: 5px;
+            text-transform: uppercase;
+            font-weight: bold;
         }
 
         .grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-            gap: 15px;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 20px;
         }
 
         .grid img {
             width: 100%;
-            height: 180px;
+            height: 250px;
             object-fit: cover;
-            border-radius: 5px;
+            border-radius: 8px;
             cursor: pointer;
-            transition: 0.2s;
-            background: #1a1a1a;
+            transition: 0.3s;
+            border: 1px solid #1a1a1a;
         }
 
         .grid img:hover {
-            opacity: 0.8;
-            transform: scale(1.02);
+            border-color: #00ffcc;
+            box-shadow: 0 0 15px rgba(0, 255, 204, 0.2);
         }
 
+        /* Lightbox */
         #lightbox {
             display: none;
             position: fixed;
-            z-index: 1000;
+            z-index: 9999;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.9);
+            background: rgba(0,0,0,0.95);
             justify-content: center;
             align-items: center;
         }
 
         #lightbox img {
-            max-width: 90%;
-            max-height: 90%;
-            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            max-width: 95%;
+            max-height: 95%;
+            box-shadow: 0 0 30px rgba(0,0,0,1);
         }
     </style>
 </head>
@@ -98,61 +144,76 @@
     <div id="main-content">
         <h1>WELCOME TO CPHAVEN</h1>
         
-        <div class="tabs">
-            <button class="tab-btn active" onclick="loadCategory('cem')">CEM</button>
-            <button class="tab-btn" onclick="loadCategory('ai')">AI</button>
+        <div id="category-screen" class="category-selector">
+            <div class="cat-card" onclick="openGallery('cem')">
+                <img src="1.png" alt="CEM Preview">
+                <span>CEM</span>
+            </div>
+            <div class="cat-card" onclick="openGallery('ai')">
+                <img src="ai1.jpeg" alt="AI Preview">
+                <span>AI Images</span>
+            </div>
         </div>
 
-        <div class="grid" id="image-grid"></div>
+        <div id="gallery-screen" class="gallery-view">
+            <button class="back-btn" onclick="showCategories()">← Back to Categories</button>
+            <h2 id="gallery-title" style="color: #00ffcc; margin-bottom: 20px;"></h2>
+            <div class="grid" id="image-grid"></div>
+        </div>
     </div>
 
     <div id="lightbox" onclick="this.style.display='none'">
-        <img id="full-img" src="" alt="Fullscreen view">
+        <img id="full-img" src="">
     </div>
 
     <script>
         const config = {
-            cem: { prefix: "", count: 22 },
-            ai: { prefix: "ai", count: 10 } 
+            cem: { prefix: "", count: 22, ext: ".png", title: "CEM GALLERY" },
+            ai: { prefix: "ai", count: 50, ext: ".jpeg", title: "AI GENERATIONS" }
         };
 
         (function init() {
             const code = prompt("ENTER ACCESS CODE:");
             if (code === "cemmy") {
                 document.getElementById('main-content').style.display = 'block';
-                loadCategory('cem');
             } else {
                 alert("ACCESS DENIED");
                 window.location.reload();
             }
         })();
 
-        function loadCategory(cat) {
+        function openGallery(cat) {
             const grid = document.getElementById('image-grid');
-            const buttons = document.querySelectorAll('.tab-btn');
+            const catScreen = document.getElementById('category-screen');
+            const galScreen = document.getElementById('gallery-screen');
+            const title = document.getElementById('gallery-title');
+            
             grid.innerHTML = "";
-
-            buttons.forEach(btn => {
-                btn.classList.toggle('active', btn.innerText.toLowerCase() === cat);
-            });
-
+            catScreen.style.display = 'none';
+            galScreen.style.display = 'block';
+            
             const data = config[cat];
+            title.innerText = data.title;
+
             for (let i = 1; i <= data.count; i++) {
                 const img = document.createElement('img');
-                img.src = `${data.prefix}${i}.png`;
-                img.onclick = () => openFullscreen(img.src);
+                const fileName = `${data.prefix}${i}${data.ext}`;
                 
-                img.onerror = function() { this.style.display = 'none'; }; 
+                img.src = fileName;
+                img.onclick = () => {
+                    const lb = document.getElementById('lightbox');
+                    document.getElementById('full-img').src = img.src;
+                    lb.style.display = 'flex';
+                };
                 
+                img.onerror = function() { this.remove(); };
                 grid.appendChild(img);
             }
         }
 
-        function openFullscreen(src) {
-            const lb = document.getElementById('lightbox');
-            const fullImg = document.getElementById('full-img');
-            fullImg.src = src;
-            lb.style.display = 'flex';
+        function showCategories() {
+            document.getElementById('category-screen').style.display = 'flex';
+            document.getElementById('gallery-screen').style.display = 'none';
         }
     </script>
 
