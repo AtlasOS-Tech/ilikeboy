@@ -19,7 +19,7 @@
         #main-content {
             display: none;
             width: 90%;
-            max-width: 1200px;
+            max-width: 1000px;
             padding: 40px 20px;
             text-align: center;
         }
@@ -29,59 +29,48 @@
             text-transform: uppercase;
             letter-spacing: 5px;
             margin-bottom: 40px;
-            font-size: 2.5rem;
+            font-size: 2rem;
         }
 
-        /* Category Selection Screen */
+        /* --- CATEGORY TILES (Smaller) --- */
         .category-selector {
             display: flex;
             justify-content: center;
-            gap: 30px;
+            gap: 20px;
             flex-wrap: wrap;
-            margin-top: 50px;
         }
 
         .cat-card {
-            width: 300px;
-            height: 400px;
+            width: 150px; /* Small Tiles */
+            height: 150px;
             position: relative;
             border-radius: 15px;
             overflow: hidden;
             cursor: pointer;
             border: 2px solid #222;
             transition: transform 0.3s ease, border-color 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #1a1a1a;
         }
 
         .cat-card:hover {
-            transform: scale(1.05);
+            transform: scale(1.1);
             border-color: #00ffcc;
         }
 
-        .cat-card img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            filter: brightness(0.5);
-            transition: filter 0.3s ease;
-        }
-
-        .cat-card:hover img {
-            filter: brightness(0.8);
-        }
-
         .cat-card span {
-            position: absolute;
-            bottom: 20px;
-            left: 0;
-            right: 0;
-            font-size: 24px;
+            position: relative;
+            z-index: 2;
+            font-size: 18px;
             font-weight: bold;
-            letter-spacing: 2px;
             text-transform: uppercase;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
         }
 
-        /* Gallery Grid */
-        .gallery-view {
+        /* --- GALLERY & VIDEO LISTS --- */
+        .view-section {
             display: none;
         }
 
@@ -99,23 +88,47 @@
 
         .grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
             gap: 20px;
         }
 
-        .grid img {
-            width: 100%;
-            height: 250px;
-            object-fit: cover;
-            border-radius: 8px;
+        /* Video Tiles in the list */
+        .video-tile {
+            height: 150px;
+            background: #111;
+            border: 2px solid #333;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
             cursor: pointer;
             transition: 0.3s;
-            border: 1px solid #1a1a1a;
         }
 
-        .grid img:hover {
-            border-color: #00ffcc;
-            box-shadow: 0 0 15px rgba(0, 255, 204, 0.2);
+        .video-tile:hover {
+            border-color: #ff0055;
+            background: #1a1a1a;
+        }
+
+        .video-tile i {
+            font-size: 40px;
+            margin-bottom: 10px;
+        }
+
+        /* --- PLAYER --- */
+        #player-container {
+            display: none;
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        iframe {
+            width: 100%;
+            aspect-ratio: 16/9;
+            border: 2px solid #333;
+            border-radius: 10px;
         }
 
         /* Lightbox */
@@ -123,43 +136,68 @@
             display: none;
             position: fixed;
             z-index: 9999;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.95);
-            justify-content: center;
-            align-items: center;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9);
+            justify-content: center; align-items: center;
         }
 
-        #lightbox img {
-            max-width: 95%;
-            max-height: 95%;
-            box-shadow: 0 0 30px rgba(0,0,0,1);
-        }
+        #lightbox img { max-width: 90%; max-height: 90%; }
     </style>
 </head>
 <body>
 
     <div id="main-content">
-        <h1>WELCOME TO CPHAVEN</h1>
+        <h1>CPHAVEN</h1>
         
+        <!-- Main Tiles -->
         <div id="category-screen" class="category-selector">
             <div class="cat-card" onclick="openGallery('cem')">
-                <img src="1.png" alt="CEM Preview">
                 <span>cp</span>
             </div>
             <div class="cat-card" onclick="openGallery('ai')">
-                <img src="ai1.jpeg" alt="AI Preview">
                 <span>AI Images</span>
+            </div>
+            <div class="cat-card" onclick="openVideoList()">
+                <span>Videos</span>
             </div>
         </div>
 
-        <div id="gallery-screen" class="gallery-view">
-            <button class="back-btn" onclick="showCategories()">← Back to Categories</button>
-            <h2 id="gallery-title" style="color: #00ffcc; margin-bottom: 20px;"></h2>
+        <!-- Image Gallery View -->
+        <div id="gallery-screen" class="view-section">
+            <button class="back-btn" onclick="showHome()">← Back</button>
+            <h2 id="gallery-title" style="color: #00ffcc;"></h2>
             <div class="grid" id="image-grid"></div>
         </div>
+
+        <!-- Video Selection View (The List) -->
+        <div id="video-list-screen" class="view-section">
+            <button class="back-btn" onclick="showHome()">← Back</button>
+            <h2 style="color: #ff0055;">SELECT A VIDEO</h2>
+            <div class="grid" id="video-grid">
+                <!-- Video Tiles -->
+                <div class="video-tile" onclick="openPlayer('15-0p5igV7_LX0Em4mQfcV7uViyAuBr2r')">
+                    <span>▶</span>
+                    <p>1.mp4</p>
+                </div>
+                <div class="video-tile" onclick="openPlayer('17hU-f4w7sheUAvZJhoag_qtr2ko8Z0qb')">
+                    <span>▶</span>
+                    <p>2.mp4</p>
+                </div>
+                <div class="video-tile" onclick="openPlayer('13hiYHvLxZIfiTJ1Uzmqbl_Md2FXkwiTx')">
+                    <span>▶</span>
+                    <p>3.mp4</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Video Player View -->
+        <div id="player-screen" class="view-section">
+            <button class="back-btn" onclick="openVideoList()">← Back to List</button>
+            <div id="player-container">
+                <iframe id="video-iframe" src="" allow="autoplay"></iframe>
+            </div>
+        </div>
+
     </div>
 
     <div id="lightbox" onclick="this.style.display='none'">
@@ -172,48 +210,75 @@
             ai: { prefix: "ai", count: 50, ext: ".jpeg", title: "AI GENERATIONS" }
         };
 
+        // 1. Password and Random Colors
         (function init() {
             const code = prompt("ENTER ACCESS CODE:");
             if (code === "cemmy") {
                 document.getElementById('main-content').style.display = 'block';
+                // Apply random colors to the tiles
+                document.querySelectorAll('.cat-card').forEach(card => {
+                    const randomHue = Math.floor(Math.random() * 360);
+                    card.style.backgroundColor = `hsl(${randomHue}, 40%, 30%)`;
+                });
             } else {
                 alert("ACCESS DENIED");
                 window.location.reload();
             }
         })();
 
+        // 2. Image Gallery Logic
         function openGallery(cat) {
+            hideAll();
             const grid = document.getElementById('image-grid');
-            const catScreen = document.getElementById('category-screen');
-            const galScreen = document.getElementById('gallery-screen');
-            const title = document.getElementById('gallery-title');
-            
-            grid.innerHTML = "";
-            catScreen.style.display = 'none';
-            galScreen.style.display = 'block';
-            
             const data = config[cat];
-            title.innerText = data.title;
+            grid.innerHTML = "";
+            document.getElementById('gallery-screen').style.display = 'block';
+            document.getElementById('gallery-title').innerText = data.title;
 
             for (let i = 1; i <= data.count; i++) {
                 const img = document.createElement('img');
-                const fileName = `${data.prefix}${i}${data.ext}`;
-                
-                img.src = fileName;
+                img.src = `${data.prefix}${i}${data.ext}`;
+                img.style.width = "100%"; img.style.height = "150px"; img.style.objectFit = "cover";
+                img.style.borderRadius = "8px"; img.style.cursor = "pointer";
                 img.onclick = () => {
-                    const lb = document.getElementById('lightbox');
                     document.getElementById('full-img').src = img.src;
-                    lb.style.display = 'flex';
+                    document.getElementById('lightbox').style.display = 'flex';
                 };
-                
                 img.onerror = function() { this.remove(); };
                 grid.appendChild(img);
             }
         }
 
-        function showCategories() {
+        // 3. Video Logic
+        function openVideoList() {
+            hideAll();
+            document.getElementById('video-list-screen').style.display = 'block';
+        }
+
+        function openPlayer(fileId) {
+            if(fileId.includes('ID_FOR')) {
+                alert("Please edit the HTML code and paste your Google Drive File IDs first!");
+                return;
+            }
+            hideAll();
+            document.getElementById('player-screen').style.display = 'block';
+            document.getElementById('player-container').style.display = 'block';
+            // Set the iframe source to the GDrive preview link
+            document.getElementById('video-iframe').src = `https://drive.google.com/file/d/${fileId}/preview`;
+        }
+
+        // 4. Navigation Helpers
+        function showHome() {
+            hideAll();
             document.getElementById('category-screen').style.display = 'flex';
+            document.getElementById('video-iframe').src = ""; // Stop video playback
+        }
+
+        function hideAll() {
+            document.getElementById('category-screen').style.display = 'none';
             document.getElementById('gallery-screen').style.display = 'none';
+            document.getElementById('video-list-screen').style.display = 'none';
+            document.getElementById('player-screen').style.display = 'none';
         }
     </script>
 
